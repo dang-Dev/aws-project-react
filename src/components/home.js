@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import ResponsiveAppBar from '../NavBar'
+import Card from '../Card/Card'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -11,6 +11,7 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: "center",
   height: "87vh",
+  overflow: 'auto',
   color: theme.palette.text.secondary,
 }));
 
@@ -41,7 +42,16 @@ const Home = () => {
           </Item>
         </Grid>
         <Grid item xs={8}>
-          <Item>xs=4</Item>
+          <Item>
+            <Card name="Ace" age={23} gender="Male" />
+            <Card name="Ace" age={23} gender="Male" />
+
+            <Card name="Ace" age={23} gender="Male" />
+            <Card name="Ace" age={23} gender="Male" />
+            <Card name="Ace" age={23} gender="Male" />
+            <Card name="Ace" age={23} gender="Male" />
+            <Card name="Ace" age={23} gender="Male" />
+          </Item>
         </Grid>
       </Grid>
     </Box>

@@ -1,0 +1,7 @@
+.card-main{
+    border: 1px solid black;
+}
+
+.card-main .card {
+    border: 1px solid red;
+}

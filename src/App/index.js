@@ -9,7 +9,7 @@ const App = () => {
         <div className="app-main">
             <Switch>
                 <Route path="/home">
-                <ResponsiveAppBar sx={{  }}/>
+                <ResponsiveAppBar/>
                     <Home/>
                 </Route>
                 <Route path="/todo-list">
