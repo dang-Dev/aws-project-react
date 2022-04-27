@@ -9,16 +9,18 @@ import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import LocalSeeIcon from '@mui/icons-material/LocalSee';
+import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
+import { useUserAuth } from "../context/UserAuthContext";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
-  borderRadius: '40px',
+  borderRadius: '5px',
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   '&:hover': {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
@@ -27,9 +29,10 @@ const Search = styled('div')(({ theme }) => ({
   marginLeft: 0,
   width: '100%',
   [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: '40%',
+    marginLeft: theme.spacing(1),
+    width: 'auto',
   },
+  border: '1px solid #cfd8dc',
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -51,12 +54,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
-      width: '20ch',
+      width: '25ch',
     },
   },
 }));
 
 export default function PrimarySearchAppBar() {
+  const { user, logOut} = useUserAuth();
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -79,7 +84,13 @@ export default function PrimarySearchAppBar() {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
-
+  const handleLogOut = async () => {
+    try{
+      await logOut();
+    }catch (err){
+      console.log(err.message);
+    }
+  }
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -98,7 +109,7 @@ export default function PrimarySearchAppBar() {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleLogOut}>Log-out</MenuItem>
     </Menu>
   );
 
@@ -121,8 +132,16 @@ export default function PrimarySearchAppBar() {
     >
       <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Badge badgeContent={5} color="error">
+            <HomeIcon />
+          </Badge>
+        </IconButton>
+        <p>Home</p>
+      </MenuItem>
+      <MenuItem>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
-            <MailIcon />
+            <SendOutlinedIcon sx={{ transform: 'rotate(320deg)'}}/>
           </Badge>
         </IconButton>
         <p>Messages</p>
@@ -134,7 +153,7 @@ export default function PrimarySearchAppBar() {
           color="inherit"
         >
           <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
+            <AddBoxOutlinedIcon  />
           </Badge>
         </IconButton>
         <p>Notifications</p>
@@ -156,7 +175,7 @@ export default function PrimarySearchAppBar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ background: "blue"}}>
+      <AppBar position="static" sx={{ background: "white", boxShadow: "none", color: "black", borderBottom: "1px solid #cfd8dc", pr: 22, pl: 22}}>
         <Toolbar>
           <IconButton
             size="large"
@@ -165,13 +184,13 @@ export default function PrimarySearchAppBar() {
             aria-label="open drawer"
             sx={{ mr: 0 }}
           >
-            <MenuIcon />
+            <LocalSeeIcon />
           </IconButton>
           <Typography
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: 'block', sm: 'block' }, mr: 20 }}
+            sx={{ display: { xs: 'block', sm: 'block' }, mr: 10 }}
           >
             PHOTOGRAPHY
           </Typography>
@@ -186,9 +205,14 @@ export default function PrimarySearchAppBar() {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+              <Badge badgeContent={5} color="error">
+                <HomeIcon />
+              </Badge>
+            </IconButton>
             <IconButton size="large" aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="error">
-                <MailIcon />
+              <SendOutlinedIcon sx={{ transform: 'rotate(320deg)'}}/>
               </Badge>
             </IconButton>
             <IconButton
@@ -197,7 +221,7 @@ export default function PrimarySearchAppBar() {
               color="inherit"
             >
               <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
+                <AddBoxOutlinedIcon />
               </Badge>
             </IconButton>
             <IconButton

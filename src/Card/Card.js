@@ -13,7 +13,8 @@ import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -34,25 +35,25 @@ export default function ViewCard() {
   };
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardHeader
+    <Card sx={{ maxWidth: "100%", marginTop: 2, border: "1px solid #cfd8dc"}}>
+      <CardHeader sx={{ textAlign: "left"}}
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
+            A
           </Avatar>
         }
         action={
           <IconButton aria-label="settings">
-            <MoreVertIcon />
+            <MoreHorizIcon />
           </IconButton>
         }
-        title="Shrimp and Chorizo Paella"
-        subheader="September 14, 2016"
+        title="Aljohn Villacruel"
+        // subheader="September 14, 2016"
       />
       <CardMedia
         component="img"
-        height="194"
-        image="../static/images/photo.jpg"
+        height="385"
+        image="/static/images/photo.jpg"
         alt="Paella dish"
       />
       <CardContent>

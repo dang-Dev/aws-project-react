@@ -3,8 +3,27 @@ html, body {
     margin: 0;
 }
 
-.app-main{
-    height: 100vh;
-    background: red;
-    justify-content: space-around;
+#root {
+    background-color: #f5f5f5;
 }
+/* width */
+::-webkit-scrollbar {
+    width: 7px;
+    display: none;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background:#b0bec5; 
+    border-radius: 5px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #90a4ae; 
+  }
