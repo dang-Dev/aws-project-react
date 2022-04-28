@@ -21,8 +21,8 @@ const App = () => {
           <Switch>
             <Route exact path="/">
               <ProtectedRoute>
-                <ResponsiveAppBar />
                 <Container fixed sx={{ width: "75%" }}>
+                <ResponsiveAppBar />
                   <Home />
                 </Container>
               </ProtectedRoute>

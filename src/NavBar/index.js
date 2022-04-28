@@ -17,6 +17,53 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import LocalSeeIcon from '@mui/icons-material/LocalSee';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import { useUserAuth } from "../context/UserAuthContext";
+import PropTypes from 'prop-types';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import CloseIcon from '@mui/icons-material/Close';
+
+
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  '& .MuiDialogContent-root': {
+    padding: theme.spacing(2),
+  },
+  '& .MuiDialogActions-root': {
+    padding: theme.spacing(1),
+  },
+}));
+
+const BootstrapDialogTitle = (props) => {
+  const { children, onClose, ...other } = props;
+
+  return (
+    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+      {children}
+      {onClose ? (
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </DialogTitle>
+  );
+};
+
+BootstrapDialogTitle.propTypes = {
+  children: PropTypes.node,
+  onClose: PropTypes.func.isRequired,
+};
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -61,6 +108,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function PrimarySearchAppBar() {
   const { user, logOut} = useUserAuth();
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -174,8 +230,9 @@ export default function PrimarySearchAppBar() {
   );
 
   return (
+    <>
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ background: "white", boxShadow: "none", color: "black", borderBottom: "1px solid #cfd8dc", pr: 22, pl: 22}}>
+      <AppBar position="static" sx={{ background: "white", boxShadow: "none", color: "black", borderBottom: "1px solid #cfd8dc"}}>
         <Toolbar>
           <IconButton
             size="large"
@@ -219,10 +276,11 @@ export default function PrimarySearchAppBar() {
               size="large"
               aria-label="show 17 new notifications"
               color="inherit"
+              onClick={handleClickOpen}
             >
-              <Badge badgeContent={17} color="error">
+              {/* <Badge badgeContent={17} color="error"> */}
                 <AddBoxOutlinedIcon />
-              </Badge>
+              {/* </Badge> */}
             </IconButton>
             <IconButton
               size="large"
@@ -253,5 +311,143 @@ export default function PrimarySearchAppBar() {
       {renderMobileMenu}
       {renderMenu}
     </Box>
+    <BootstrapDialog
+    onClose={handleClose}
+    aria-labelledby="customized-dialog-title"
+    open={open}
+  >
+    <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      Create New Post
+    </BootstrapDialogTitle>
+    <DialogContent dividers>
+      <Typography gutterBottom>
+        Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+        dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
+        consectetur ac, vestibulum at eros.
+      </Typography>
+      <Typography gutterBottom>
+        Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
+        Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+      </Typography>
+      <Typography gutterBottom>
+        Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus
+        magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec
+        ullamcorper nulla non metus auctor fringilla.
+      </Typography>
+    </DialogContent>
+    <DialogActions>
+      <Button autoFocus onClick={handleClose}>
+        Save changes
+      </Button>
+    </DialogActions>
+  </BootstrapDialog>
+  </>
   );
 }
+
+
+// import * as React from 'react';
+// import Box from '@mui/material/Box';
+// import Avatar from '@mui/material/Avatar';
+// import Menu from '@mui/material/Menu';
+// import MenuItem from '@mui/material/MenuItem';
+// import ListItemIcon from '@mui/material/ListItemIcon';
+// import Divider from '@mui/material/Divider';
+// import IconButton from '@mui/material/IconButton';
+// import Typography from '@mui/material/Typography';
+// import Tooltip from '@mui/material/Tooltip';
+// import PersonAdd from '@mui/icons-material/PersonAdd';
+// import Settings from '@mui/icons-material/Settings';
+// import Logout from '@mui/icons-material/Logout';
+
+// export default function AccountMenu() {
+//   const [anchorEl, setAnchorEl] = React.useState(null);
+//   const open = Boolean(anchorEl);
+//   const handleClick = (event) => {
+//     setAnchorEl(event.currentTarget);
+//   };
+//   const handleClose = () => {
+//     setAnchorEl(null);
+//   };
+//   return (
+//     <React.Fragment>
+//       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+//         <Typography sx={{ minWidth: 100 }}>Contact</Typography>
+//         <Typography sx={{ minWidth: 100 }}>Profile</Typography>
+//         <Tooltip title="Account settings">
+//           <IconButton
+//             onClick={handleClick}
+//             size="small"
+//             sx={{ ml: 2 }}
+//             aria-controls={open ? 'account-menu' : undefined}
+//             aria-haspopup="true"
+//             aria-expanded={open ? 'true' : undefined}
+//           >
+//             <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+//           </IconButton>
+//         </Tooltip>
+//       </Box>
+//       <Menu
+//         anchorEl={anchorEl}
+//         id="account-menu"
+//         open={open}
+//         onClose={handleClose}
+//         onClick={handleClose}
+//         PaperProps={{
+//           elevation: 0,
+//           sx: {
+//             overflow: 'visible',
+//             filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+//             mt: 1.5,
+//             '& .MuiAvatar-root': {
+//               width: 32,
+//               height: 32,
+//               ml: -0.5,
+//               mr: 1,
+//             },
+//             '&:before': {
+//               content: '""',
+//               display: 'block',
+//               position: 'absolute',
+//               top: 0,
+//               right: 14,
+//               width: 10,
+//               height: 10,
+//               bgcolor: 'background.paper',
+//               transform: 'translateY(-50%) rotate(45deg)',
+//               zIndex: 0,
+//             },
+//           },
+//         }}
+//         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+//         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+//       >
+//         <MenuItem>
+//           <Avatar /> Profile
+//         </MenuItem>
+//         <MenuItem>
+//           <Avatar /> My account
+//         </MenuItem>
+//         <Divider />
+//         <MenuItem>
+//           <ListItemIcon>
+//             <PersonAdd fontSize="small" />
+//           </ListItemIcon>
+//           Add another account
+//         </MenuItem>
+//         <MenuItem>
+//           <ListItemIcon>
+//             <Settings fontSize="small" />
+//           </ListItemIcon>
+//           Settings
+//         </MenuItem>
+//         <MenuItem>
+//           <ListItemIcon>
+//             <Logout fontSize="small" />
+//           </ListItemIcon>
+//           Logout
+//         </MenuItem>
+//       </Menu>
+//     </React.Fragment>
+//   );
+// }

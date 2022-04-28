@@ -19,7 +19,7 @@ const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(0),
   textAlign: "center",
-  height: "87vh",
+  height: "90vh",
   overflow: "auto",
   borderRadius: "0px",
   boxShadow: "none",
