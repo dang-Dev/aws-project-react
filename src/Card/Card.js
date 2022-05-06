@@ -1,113 +1,233 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
-import Avatar from '@mui/material/Avatar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ShareIcon from '@mui/icons-material/Share';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import React, { useEffect, useState, useRef } from "react";
+import Card from "@mui/material/Card";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import Divider from "@mui/material/Divider";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import CommentIcon from "@mui/icons-material/Comment";
+import {
+  doc,
+  getDocs,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  addDoc,
+  collection,
+} from "firebase/firestore";
+import { db } from "../firebase";
+import InputBase from "@mui/material/InputBase";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
+export default function ViewCard(props) {
+  const { collections, currentUser, uid } = props;
+  const [heartState, setHeartState] = useState(false);
+  const [userComment, setUserComment] = useState();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [comments, setComments] = useState();
+  const commentInput = useRef(null);
+  const newFormatDateTime = new Date(
+    collections.createdAt && collections.createdAt.seconds * 1000
+  );
+  const collection_id = collections.id;
+  const userReaction = collections.reactions;
+  const updateUserReact = async (post_id, my_id) => {
+    const postDoc = doc(db, "CollectionPost", post_id);
+    if (userReaction.indexOf(my_id) === -1) {
+      const newFields = { reactions: arrayUnion(my_id) };
+      await updateDoc(postDoc, newFields);
+      setHeartState(true);
+    } else {
+      const newFields = { reactions: arrayRemove(my_id) };
+      await updateDoc(postDoc, newFields);
+      setHeartState(false);
+    }
+  };
 
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
+  useEffect(() => {
+    if (userReaction.indexOf(uid) !== -1) {
+      setHeartState(true);
+    }
+  }, [userReaction, uid]);
 
-export default function ViewCard() {
-  const [expanded, setExpanded] = React.useState(false);
+  function stringToColor(string) {
+    let hash = 0;
+    let i;
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+    /* eslint-disable no-bitwise */
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    let color = "#";
+
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    /* eslint-enable no-bitwise */
+
+    return color;
+  }
+
+  function stringAvatar(name) {
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+    };
+  }
+
+  const handleComments = (e) => {
+    setUserComment(e.target.value);
+  };
+
+  const handleCommentPost = async () => {
+    const postDoc = collection(db, `CollectionPost/${collection_id}/comments`);
+    const newFields = {
+      userID: uid,
+      comment: userComment,
+    };
+    await addDoc(postDoc, newFields);
+    setUserComment("");
+    commentInput.current.value = "";
+  };
+  
+  useEffect(()=> {
+    async function getAllComments(){
+      const postDocComments = collection(db, `CollectionPost/${collection_id}/comments`);
+      const docSnap = await getDocs(postDocComments);
+      setComments(docSnap.docs.map((doc) => ({ ...doc.data(), id: doc.id})));
+    }
+    getAllComments();
+  }, [collection_id]);
+  
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
   };
 
   return (
-    <Card sx={{ maxWidth: "100%", marginTop: 2, border: "1px solid #cfd8dc"}}>
-      <CardHeader sx={{ textAlign: "left"}}
+    <>
+    <Card sx={{ maxWidth: "100%", marginTop: 2, border: "1px solid #cfd8dc" }}>
+      <CardHeader
+        sx={{ textAlign: "left" }}
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            A
-          </Avatar>
+          currentUser ? (
+            <Avatar
+              {...stringAvatar(
+                currentUser.firstName + " " + currentUser.lastName
+              )}
+            />
+          ) : (
+            "No Avatar"
+          )
         }
         action={
           <IconButton aria-label="settings">
             <MoreHorizIcon />
           </IconButton>
         }
-        title="Aljohn Villacruel"
-        // subheader="September 14, 2016"
+        title={
+          currentUser && currentUser.firstName + " " + currentUser.lastName
+        }
+        subheader={newFormatDateTime.toLocaleString()}
       />
       <CardMedia
         component="img"
         height="385"
-        image="/static/images/photo.jpg"
-        alt="Paella dish"
+        image={collections.imageURL}
+        alt="Image"
       />
-      <CardContent>
-        <Typography variant="body2" color="text.secondary">
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the mussels,
-          if you like.
-        </Typography>
-      </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
+        <IconButton
+          aria-label="add to favorites"
+          onClick={() => {
+            updateUserReact(collection_id, uid);
+          }}
+        >
+          {heartState ? (
+            <FavoriteIcon sx={{ color: "#ed4956" }} />
+          ) : (
+            <FavoriteBorderIcon />
+          )}
         </IconButton>
         <IconButton aria-label="share">
-          <ShareIcon />
+          <CommentIcon />
         </IconButton>
-        <ExpandMore
-          expand={expanded}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </ExpandMore>
       </CardActions>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          <Typography paragraph>Method:</Typography>
-          <Typography paragraph>
-            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set
-            aside for 10 minutes.
-          </Typography>
-          <Typography paragraph>
-            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over
-            medium-high heat. Add chicken, shrimp and chorizo, and cook, stirring
-            occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a
-            large plate and set aside, leaving chicken and chorizo in the pan. Add
-            pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook,
-            stirring often until thickened and fragrant, about 10 minutes. Add
-            saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
-          </Typography>
-          <Typography paragraph>
-            Add rice and stir very gently to distribute. Top with artichokes and
-            peppers, and cook without stirring, until most of the liquid is absorbed,
-            15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and
-            mussels, tucking them down into the rice, and cook again without
-            stirring, until mussels have opened and rice is just tender, 5 to 7
-            minutes more. (Discard any mussels that don&apos;t open.)
-          </Typography>
-          <Typography>
-            Set aside off of the heat to let rest for 10 minutes, and then serve.
-          </Typography>
-        </CardContent>
-      </Collapse>
+      <CardContent sx={{ textAlign: "left", pt: 0 }}>
+        <Typography sx={{ fontWeight: "600", fontSize: "14px" }}>
+          {userReaction.length !== 0 &&
+            (userReaction.length > 1
+              ? userReaction.length + " likes"
+              : userReaction.length + " like")}
+        </Typography>
+        <Typography sx={{ fontSize: "14px", color: "#bdbdbd", cursor: "pointer" }} onClick={handleClickOpen}>
+          {comments && ( "View All " + comments.length + " comments")}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>
+            {currentUser && currentUser.firstName + " " + currentUser.lastName}
+          </b>{" "}
+          {collections.description}
+        </Typography>
+      </CardContent>
+      <Divider variant="fullWidth" />
+      <CardActions sx={{}}>
+        <Box sx={{ display: "flex", alignItems: "flex-end", width: "100%" }}>
+          <AccountCircle sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+          <InputBase
+            sx={{ ml: 0, flex: 1 }}
+            placeholder="Add comment..."
+            inputProps={{ "aria-label": "add comment" }}
+            onChange={handleComments}
+            inputRef={commentInput}
+          />
+          <IconButton
+            color="primary"
+            aria-label="directions"
+            onClick={handleCommentPost}
+          >
+            <Typography>{"Post"}</Typography>
+          </IconButton>
+        </Box>
+      </CardActions>
     </Card>
+    <Dialog
+    fullWidth={true}
+    maxWidth={"md"}
+    open={openDialog}
+    onClose={handleClose}
+  >
+    <DialogTitle>Optional sizes</DialogTitle>
+    <DialogContent>
+      <DialogContentText>
+        You can set my maximum width and whether to adapt or not.
+      </DialogContentText>
+      
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleClose}>Close</Button>
+    </DialogActions>
+  </Dialog>
+  </>
   );
 }

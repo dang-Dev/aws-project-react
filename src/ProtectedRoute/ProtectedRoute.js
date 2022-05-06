@@ -12,7 +12,7 @@ const ProtectedRoute = ({children}) => {
             unsubscribe();
         }
     }, []);
-    console.log(user1);
+    
     if (!user1){
         return <Redirect to="/sign-in"/>
     }

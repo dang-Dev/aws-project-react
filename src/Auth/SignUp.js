@@ -3,8 +3,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -15,7 +13,11 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useUserAuth } from "../context/UserAuthContext";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
+import { db } from "../firebase";
+import { setDoc, doc } from "firebase/firestore";
 
 function Copyright(props) {
   return (
@@ -41,13 +43,25 @@ export default function SignUnSide() {
   const [error, setError] = React.useState("");
   const { signUp } = useUserAuth();
   let history = useHistory();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
     const data = new FormData(event.currentTarget);
     try {
       await signUp(data.get("email"), data.get("password"));
-      history.push("/")
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          const uid = user.uid;
+          setDoc(doc(db, "users", uid), {
+            firstName: data.get("firstName"),
+            lastName: data.get("lastName"),
+            email: data.get("email"),
+            password: data.get("password"),
+          });
+          history.push("/");
+        }
+      });
     } catch (err) {
       setError(err.message);
     }
@@ -89,37 +103,61 @@ export default function SignUnSide() {
             <Typography component="h1" variant="h5">
               Sign up
             </Typography>
-            {error && <Stack sx={{ width: "100%" }}><Alert severity="error">{error}</Alert></Stack>}
+            {error && (
+              <Stack sx={{ width: "100%" }}>
+                <Alert severity="error">{error}</Alert>
+              </Stack>
+            )}
             <Box
               component="form"
               noValidate
               onSubmit={handleSubmit}
               sx={{ mt: 1 }}
             >
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    autoComplete="given-name"
+                    name="firstName"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="family-name"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                  />
+                </Grid>
+              </Grid>
               <Button
                 type="submit"
                 fullWidth
@@ -128,8 +166,8 @@ export default function SignUnSide() {
               >
                 Sign Up
               </Button>
-              <Grid container>
-                <Grid item xs>
+              <Grid container justifyContent="flex-end">
+                <Grid item>
                   <Link href="/sign-in" variant="body2">
                     Already have an account? Sign in
                   </Link>

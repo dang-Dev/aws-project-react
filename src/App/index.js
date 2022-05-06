@@ -6,7 +6,6 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
 import Home from "../components/home";
-import TodoList from "../components/todolist";
 import Login from "../Auth/Login";
 import SignUp from "../Auth/SignUp";
 import { UserAuthContextProvider } from "../context/UserAuthContext";
@@ -26,9 +25,6 @@ const App = () => {
                   <Home />
                 </Container>
               </ProtectedRoute>
-            </Route>
-            <Route path="/todo-list">
-              <TodoList />
             </Route>
             <Route path="/sign-in">
               <Login />

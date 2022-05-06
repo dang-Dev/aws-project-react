@@ -33,19 +33,21 @@ function stringAvatar(name) {
   };
 }
 
-export default function AvatarCard() {
+export default function AvatarCard(props) {
+  const {firstName, lastName} = props
+  const fullname = firstName + " " + lastName;
   return (
         <CardHeader sx={{ textAlign: "left", fontSize: "10px"}}
         avatar={
-            <Avatar {...stringAvatar('Aljohn Villacruel')} />
+            <Avatar {...stringAvatar(fullname)} />
         }
         action={
           <IconButton aria-label="settings">
             <MoreHorizIcon />
           </IconButton>
         }
-        title="Aljohn Villacruel"
-        subheader="Aljohn"
+        title = {fullname}
+        subheader={firstName}
       />
   );
 }
