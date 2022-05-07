@@ -126,45 +126,63 @@ export default function ViewCard(props) {
 
   const handlePopCommentPost = async () => {
     const popComment = popUpCommentInput.current.value;
-    const postDoc = collection(db, `CollectionPost/${collection_id}/comments`);
-    const newFields = {
-      userID: uid,
-      comment: popComment,
-      createdAt: serverTimestamp(),
-    };
-    await addDoc(postDoc, newFields);
-    popUpCommentInput.current.value = "";
-    const postDocComments = collection(
-      db,
-      `CollectionPost/${collection_id}/comments`
-    );
-    const q = query(postDocComments, orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-      setComments(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    });
+    if (popComment !== "") {
+      const postDoc = collection(
+        db,
+        `CollectionPost/${collection_id}/comments`
+      );
+      const newFields = {
+        userID: uid,
+        comment: popComment,
+        createdAt: serverTimestamp(),
+      };
+      await addDoc(postDoc, newFields);
+      popUpCommentInput.current.value = "";
+      const postDocComments = collection(
+        db,
+        `CollectionPost/${collection_id}/comments`
+      );
+      const q = query(postDocComments, orderBy("createdAt", "desc"));
+      onSnapshot(q, (snapshot) => {
+        setComments(
+          snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+        );
+      });
+    } else {
+      console.log("No Comment");
+    }
   };
 
   const handleCommentPost = async () => {
-    const postDoc = collection(db, `CollectionPost/${collection_id}/comments`);
-    const newFields = {
-      userID: uid,
-      comment: userComment,
-      createdAt: serverTimestamp(),
-    };
-    await addDoc(postDoc, newFields);
-    setUserComment("");
-    commentInput.current.value = "";
-    const postDocComments = collection(
-      db,
-      `CollectionPost/${collection_id}/comments`
-    );
-    const q = query(postDocComments, orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-      setComments(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    });
+    const cardComment = commentInput.current.value;
+    if (cardComment !== "") {
+      const postDoc = collection(
+        db,
+        `CollectionPost/${collection_id}/comments`
+      );
+      const newFields = {
+        userID: uid,
+        comment: userComment,
+        createdAt: serverTimestamp(),
+      };
+      await addDoc(postDoc, newFields);
+      commentInput.current.value = "";
+      const postDocComments = collection(
+        db,
+        `CollectionPost/${collection_id}/comments`
+      );
+      const q = query(postDocComments, orderBy("createdAt", "desc"));
+      onSnapshot(q, (snapshot) => {
+        setComments(
+          snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+        );
+      });
+    } else {
+      console.log("No Comment");
+    }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     async function getAllComments() {
       const postDocComments = collection(
         db,
@@ -172,7 +190,9 @@ export default function ViewCard(props) {
       );
       const q = query(postDocComments, orderBy("createdAt", "desc"));
       onSnapshot(q, (snapshot) => {
-        setComments(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+        setComments(
+          snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+        );
       });
     }
     getAllComments();
