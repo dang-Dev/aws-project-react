@@ -3,6 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Typography } from '@mui/material';
 
 function stringToColor(string) {
   let hash = 0;
@@ -34,10 +35,10 @@ function stringAvatar(name) {
 }
 
 export default function AvatarCard(props) {
-  const {firstName, lastName} = props
+  const {firstName, lastName, isNeckName} = props
   const fullname = firstName + " " + lastName;
   return (
-        <CardHeader sx={{ textAlign: "left", fontSize: "10px"}}
+        <CardHeader sx={{ p:1.5, textAlign: "left", fontSize: "10px",  boxShadow: "none"}}
         avatar={
             <Avatar {...stringAvatar(fullname)} />
         }
@@ -46,8 +47,8 @@ export default function AvatarCard(props) {
             <MoreHorizIcon />
           </IconButton>
         }
-        title = {fullname}
-        subheader={firstName}
+        title = {<Typography sx={{fontWeight: "550", fontSize: "14px"}}>{fullname}</Typography>}
+        subheader={isNeckName && firstName}
       />
   );
 }

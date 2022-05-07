@@ -45,6 +45,7 @@ export default function SignInSide() {
         history.push("/")
     } catch (err) {
         setError(err.message);
+        console.log(err.message);
     }
   };
 
@@ -128,6 +129,8 @@ export default function SignInSide() {
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
+
+
               </Grid>
               <Copyright sx={{ mt: 5 }} />
             </Box>

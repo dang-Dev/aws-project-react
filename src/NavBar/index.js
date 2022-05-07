@@ -28,8 +28,6 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
-import PersonAdd from "@mui/icons-material/PersonAdd";
-import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
 import TextField from "@mui/material/TextField";
@@ -268,24 +266,9 @@ export default function PrimarySearchAppBar() {
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
       <MenuItem>
-        <Avatar /> Profile
-      </MenuItem>
-      <MenuItem>
         <Avatar /> My account
       </MenuItem>
       <Divider />
-      <MenuItem>
-        <ListItemIcon>
-          <PersonAdd fontSize="small" />
-        </ListItemIcon>
-        Add another account
-      </MenuItem>
-      <MenuItem>
-        <ListItemIcon>
-          <Settings fontSize="small" />
-        </ListItemIcon>
-        Settings
-      </MenuItem>
       <MenuItem onClick={handleLogOut}>
         <ListItemIcon>
           <Logout fontSize="small" />
@@ -398,23 +381,14 @@ export default function PrimarySearchAppBar() {
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <IconButton
                 size="large"
-                aria-label="show 4 new mails"
+                aria-label="home"
                 color="inherit"
               >
                 <HomeIcon />
               </IconButton>
               <IconButton
                 size="large"
-                aria-label="show 4 new mails"
-                color="inherit"
-              >
-                <Badge badgeContent={4} color="error">
-                  <SendOutlinedIcon sx={{ transform: "rotate(320deg)" }} />
-                </Badge>
-              </IconButton>
-              <IconButton
-                size="large"
-                aria-label="show 17 new notifications"
+                aria-label="add post"
                 color="inherit"
                 onClick={handleClickOpen}
               >

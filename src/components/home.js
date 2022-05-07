@@ -96,7 +96,7 @@ const Home = () => {
             <Grid container rowSpacing={0}>
               <Grid item xs={12}  > 
                 <ColItem>
-                  <AvatarCard firstName={currentUserData ? currentUserData["firstName"] : "No data!"} lastName={currentUserData ? currentUserData["lastName"] : "No data!"} />
+                  <AvatarCard isNeckName={true} firstName={currentUserData ? currentUserData["firstName"] : "No data!"} lastName={currentUserData ? currentUserData["lastName"] : "No data!"} />
                 </ColItem>
               </Grid>
               <Grid item xs={12}>
