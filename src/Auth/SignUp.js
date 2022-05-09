@@ -58,6 +58,8 @@ export default function SignUnSide() {
             lastName: data.get("lastName"),
             email: data.get("email"),
             password: data.get("password"),
+            neckName: "",
+            tagLine: "",
           });
           history.push("/");
         }

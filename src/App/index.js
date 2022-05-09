@@ -10,19 +10,28 @@ import Login from "../Auth/Login";
 import SignUp from "../Auth/SignUp";
 import { UserAuthContextProvider } from "../context/UserAuthContext";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
+import Profile from '../components/profile'
 
 const App = () => {
   return (
     <React.Fragment>
       <CssBaseline />
-      <Box sx={{ height: "100vh" }}>
+      <Box sx={{ height: "100vh"}}>
         <UserAuthContextProvider>
           <Switch>
             <Route exact path="/">
               <ProtectedRoute>
-                <Container fixed sx={{ width: "75%" }}>
                 <ResponsiveAppBar />
+                <Container fixed sx={{width: "73%"}} >
                   <Home />
+                </Container>
+              </ProtectedRoute>
+            </Route>
+            <Route path="/:userID/profile">
+              <ProtectedRoute>
+              <ResponsiveAppBar />
+                <Container fixed sx={{width: "73%"}}>
+                  <Profile/>
                 </Container>
               </ProtectedRoute>
             </Route>

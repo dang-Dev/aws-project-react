@@ -26,6 +26,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import InputBase from "@mui/material/InputBase";
@@ -34,13 +35,15 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import AvatarCard from "../Avatar/Avatar";
 import CommentCard from "./CommentCard";
+import { Link } from "@mui/material";
 
 export default function ViewCard(props) {
   const { collections, currentUser, uid } = props;
   const [heartState, setHeartState] = useState(false);
   const [userComment, setUserComment] = useState();
   const [openDialog, setOpenDialog] = useState(false);
-  const [comments, setComments] = useState();
+  const [comments, setComments] = useState({});
+  const [cardUser, setCardUser] = useState({});
   const commentInput = useRef(null);
   const popUpCommentInput = useRef(null);
   const newFormatDateTime = new Date(
@@ -71,6 +74,15 @@ export default function ViewCard(props) {
     borderBottom: "1px solid #eceff1",
     color: theme.palette.text.secondary,
   }));
+
+  useEffect(() => {
+    const getUser = async () => {
+      const docRef = doc(db, "users", `${collections.userID}`);
+      const data = await getDoc(docRef);
+      setCardUser(data.data());
+    }; 
+    getUser();
+  }, [collections.userID]);
 
   const updateUserReact = async (post_id, my_id) => {
     const postDoc = doc(db, "CollectionPost", post_id);
@@ -220,7 +232,7 @@ export default function ViewCard(props) {
             currentUser ? (
               <Avatar
                 {...stringAvatar(
-                  currentUser.firstName + " " + currentUser.lastName
+                  cardUser.firstName + " " + cardUser.lastName
                 )}
               />
             ) : (
@@ -233,7 +245,7 @@ export default function ViewCard(props) {
             </IconButton>
           }
           title={
-            currentUser && currentUser.firstName + " " + currentUser.lastName
+            <Link href={`/${collections.userID}/profile`} underline="none" variant="body1" color="black" sx={{fontSize: "15px", fontWeight:"600"}}>{cardUser && cardUser.firstName + "" + cardUser.lastName}</Link>
           }
           subheader={newFormatDateTime.toLocaleString()}
         />

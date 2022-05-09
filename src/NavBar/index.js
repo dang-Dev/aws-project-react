@@ -37,6 +37,8 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import LinearProgress from "@mui/material/LinearProgress";
 import { addDoc, serverTimestamp, collection } from "firebase/firestore";
 import { db } from "../firebase";
+import { useHistory } from "react-router-dom";
+import Container from "@mui/material/Container";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -122,6 +124,8 @@ export default function PrimarySearchAppBar() {
   const [preview, setPreview] = useState();
   const [progress, setProgress] = useState(0);
   const [description, setDescription] = useState();
+  const history = useHistory();
+
   // create a preview as a side effect, whenever selected file is changed
   useEffect(() => {
     if (!selectedFile) {
@@ -131,7 +135,7 @@ export default function PrimarySearchAppBar() {
 
     const objectUrl = URL.createObjectURL(selectedFile);
     setPreview(objectUrl);
-    
+
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
 
@@ -242,6 +246,7 @@ export default function PrimarySearchAppBar() {
           overflow: "visible",
           filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
           mt: 1.5,
+          width: 200,
           "& .MuiAvatar-root": {
             width: 32,
             height: 32,
@@ -265,8 +270,8 @@ export default function PrimarySearchAppBar() {
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      <MenuItem>
-        <Avatar /> My account
+      <MenuItem onClick={()=>{history.push(`/${user.uid}/profile`)}}>
+        <Avatar /> Profile
       </MenuItem>
       <Divider />
       <MenuItem onClick={handleLogOut}>
@@ -350,6 +355,7 @@ export default function PrimarySearchAppBar() {
             borderBottom: "1px solid #cfd8dc",
           }}
         >
+          <Container fixed sx={{width: "76%"}}>
           <Toolbar>
             <IconButton
               size="large"
@@ -379,11 +385,7 @@ export default function PrimarySearchAppBar() {
             </Search>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <IconButton
-                size="large"
-                aria-label="home"
-                color="inherit"
-              >
+              <IconButton size="large" aria-label="home" color="inherit" onClick={()=>{history.push("/")}}>
                 <HomeIcon />
               </IconButton>
               <IconButton
@@ -421,6 +423,7 @@ export default function PrimarySearchAppBar() {
               </IconButton>
             </Box>
           </Toolbar>
+          </Container>
         </AppBar>
         {renderMobileMenu}
         {renderMenu}
@@ -438,9 +441,13 @@ export default function PrimarySearchAppBar() {
           Create New Post
         </BootstrapDialogTitle>
         <DialogContent dividers>
-          {progress !== 0 ?<Box sx={{ width: "100%", mb:1 }}>
-            <LinearProgress variant="determinate" value={progress} />
-          </Box>: ""}
+          {progress !== 0 ? (
+            <Box sx={{ width: "100%", mb: 1 }}>
+              <LinearProgress variant="determinate" value={progress} />
+            </Box>
+          ) : (
+            ""
+          )}
           <Box
             sx={{
               p: 1,

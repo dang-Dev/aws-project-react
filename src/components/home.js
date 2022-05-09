@@ -91,9 +91,9 @@ const Home = () => {
             )}
           </Item>
         </Grid>
-        <Grid item xs={4} sx={{mt:2}}>
-          <Item>
-            <Grid container rowSpacing={0}>
+        <Grid item xs={4} >
+          <Item >
+            <Grid container rowSpacing={0} sx={{mt:2}}>
               <Grid item xs={12}  > 
                 <ColItem>
                   <AvatarCard isNeckName={true} firstName={currentUserData ? currentUserData["firstName"] : "No data!"} lastName={currentUserData ? currentUserData["lastName"] : "No data!"} />
