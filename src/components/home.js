@@ -17,6 +17,24 @@ import { db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 
+function Copyright() {
+  return (
+    <>
+    <Typography variant="body2" color="secondary" align="center">
+      {"Copyright © "}
+      <Link color="inherit" href="#">
+        PHOTOGRAPHY
+      </Link>{" "}
+      {new Date().getFullYear()}
+      {"."}
+    </Typography>
+    <Typography variant="body2" color="text.secondary" align="center">
+    {"AljohnVillacruel & IanAgapito"}
+  </Typography>
+  </>
+  );
+}
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#f5f5f5",
   ...theme.typography.body2,
@@ -41,7 +59,7 @@ const ColItem = styled(Paper)(({ theme }) => ({
 
 const Home = () => {
   const [user, setUser] = useState({});
-  const [currentUserData, setCurrentUserData] = useState({});
+  const [currentUserData, setCurrentUserData] = useState();
   const [collectionPost, setCollectionPost] = useState();
 
   onAuthStateChanged(auth, (currentUser) => {
@@ -96,7 +114,7 @@ const Home = () => {
             <Grid container rowSpacing={0} sx={{mt:2}}>
               <Grid item xs={12}  > 
                 <ColItem>
-                  <AvatarCard isNeckName={true} firstName={currentUserData ? currentUserData["firstName"] : "No data!"} lastName={currentUserData ? currentUserData["lastName"] : "No data!"} />
+                    <AvatarCard neckName={currentUserData ? currentUserData.neckName : "No Data!"} firstName={currentUserData ? currentUserData["firstName"].charAt(0).toUpperCase() + currentUserData["firstName"].slice(1) : "No data!"} lastName={currentUserData ? currentUserData["lastName"].charAt(0).toUpperCase() + currentUserData["lastName"].slice(1) : "No data!"} />
                 </ColItem>
               </Grid>
               <Grid item xs={12}>
@@ -118,16 +136,19 @@ const Home = () => {
                         }
                       >
                         <ListItemAvatar>
-                          <Avatar>A</Avatar>
+                          <Avatar>C</Avatar>
                         </ListItemAvatar>
                         <ListItemText
-                          primary="Single-line item"
+                          primary="Coming Soon"
                           secondary="Secondary text"
                         />
                       </ListItem>
                     )}
                   </List>
                 </ColItem>
+                  <Box sx={{m:3}}> 
+                  <Copyright />
+                  </Box>
               </Grid>
             </Grid>
           </Item>

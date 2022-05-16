@@ -34,21 +34,21 @@ function stringAvatar(name) {
   };
 }
 
-export default function AvatarCard(props) {
-  const {firstName, lastName, isNeckName} = props
-  const fullname = firstName + " " + lastName;
+export default function  AvatarCard(props) {
+  const {firstName, lastName, neckName} = props
+  const fullName = String(firstName) + " " + String(lastName);
   return (
         <CardHeader sx={{ p:1.5, textAlign: "left", fontSize: "10px",  boxShadow: "none"}}
         avatar={
-            <Avatar {...stringAvatar(fullname)} />
+            <Avatar {...stringAvatar(firstName ? fullName : "No Data!")} />
         }
         action={
           <IconButton aria-label="settings">
             <MoreHorizIcon />
           </IconButton>
         }
-        title = {<Typography sx={{fontWeight: "550", fontSize: "14px"}}>{fullname}</Typography>}
-        subheader={isNeckName && firstName}
+        title = {<Typography sx={{fontWeight: "550", fontSize: "14px"}}>{fullName}</Typography>}
+        subheader={neckName ? neckName: ""}
       />
   );
 }
