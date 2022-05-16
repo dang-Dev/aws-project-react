@@ -58,14 +58,14 @@ function Copyright() {
 export default function Profile() {
   const [myPost, setMyPost] = useState({});
   const { user } = useUserAuth();
-  const [userDetails, setUserDetails] = useState({});
+  const [userDetails, setUserDetails] = useState();
   const [openDialog, setDialogOpen] = useState(false);
   const [firstNameRef, setFirstNameRef] = useState("");
   const [lastNameRef, setLastNameRef] = useState("");
   const [neckNameRef, setNeckNameRef] = useState("");
   const [tagLineRef, setTagLineRef] = useState("");
-  let { userID } = useParams(); 
-  
+  let { userID } = useParams();
+
   const handleDialogOpen = () => {
     setDialogOpen(true);
     setFirstNameRef(userDetails.firstName);
@@ -126,11 +126,7 @@ export default function Profile() {
           <Grid container spacing={0} sx={{ mb: 2 }}>
             <Grid item xs={6} md={4}>
               <Item sx={{ display: "flex", justifyContent: "center" }}>
-                <Avatar
-                  alt="P"
-                  src=""
-                  sx={{ width: 150, height: 150 }}
-                />
+                <Avatar alt="P" src="" sx={{ width: 150, height: 150 }} />
               </Item>
             </Grid>
             <Grid item xs={6} md={8}>
@@ -146,9 +142,9 @@ export default function Profile() {
                           >
                             <Typography variant="h5" component="span">
                               {userDetails &&
-                                userDetails.firstName +
+                                userDetails.firstName.charAt(0).toUpperCase() + userDetails.firstName.slice(1) +
                                   " " +
-                                  userDetails.lastName}
+                                  userDetails.lastName.charAt(0).toUpperCase() + userDetails.lastName.slice(1)}
                             </Typography>
                           </TableCell>
                           <TableCell
@@ -156,14 +152,16 @@ export default function Profile() {
                             padding={"none"}
                             sx={{ borderBottom: "none" }}
                           >
-                            {userID === user.uid && <Button
-                              variant="outlined"
-                              size="small"
-                              color="info"
-                              onClick={handleDialogOpen}
-                            >
-                              Edit Profile
-                            </Button>}
+                            {userID === user.uid && (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                color="info"
+                                onClick={handleDialogOpen}
+                              >
+                                Edit Profile
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
                       </TableBody>
@@ -209,7 +207,7 @@ export default function Profile() {
                     return <CardProfilePost post={post} key={post.id} />;
                   })
                 ) : (
-                  <Typography sx={{ mt: 2 }}>"No Data Available!"</Typography>
+                  <Box sx={{ mt: 2, textAlign: "center" }}><Typography >"No Data Available!"</Typography></Box>
                 ))}
             </Grid>
           </Box>
@@ -243,7 +241,9 @@ export default function Profile() {
                   id="firstName"
                   label="First Name"
                   value={firstNameRef}
-                  onChange={(e)=>{setFirstNameRef(e.target.value)}}
+                  onChange={(e) => {
+                    setFirstNameRef(e.target.value);
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -255,7 +255,9 @@ export default function Profile() {
                   name="lastName"
                   autoComplete="family-name"
                   value={lastNameRef}
-                  onChange={(e)=>{setLastNameRef(e.target.value)}}
+                  onChange={(e) => {
+                    setLastNameRef(e.target.value);
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -267,7 +269,9 @@ export default function Profile() {
                   name="neckName"
                   autoComplete="neck-name"
                   value={neckNameRef}
-                  onChange={(e)=>{setNeckNameRef(e.target.value)}}
+                  onChange={(e) => {
+                    setNeckNameRef(e.target.value);
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -279,7 +283,9 @@ export default function Profile() {
                   id="tagLine"
                   autoComplete="tag-line"
                   value={tagLineRef}
-                  onChange={(e)=>{setTagLineRef(e.target.value)}}
+                  onChange={(e) => {
+                    setTagLineRef(e.target.value);
+                  }}
                 />
               </Grid>
             </Grid>

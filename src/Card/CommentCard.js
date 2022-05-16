@@ -6,6 +6,8 @@ import { Typography } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
+import { Link } from "@mui/material";
+
 
 function stringToColor(string) {
   let hash = 0;
@@ -53,8 +55,6 @@ export default function AvatarCard(props) {
     setFullName(currentUserData.firstName + " " + currentUserData.lastName);
   }, [commentUserID, currentUserData]);
 
-  // console.log(in_day.toFixed(0));
-
   useEffect(() => {
     const todayDateTime = new Date();
     const newFormatDateTime = new Date(createdAt && createdAt.seconds * 1000);
@@ -88,8 +88,18 @@ export default function AvatarCard(props) {
         </IconButton>
       }
       title={
-        <Typography sx={{ fontWeight: "500", fontSize: "14px" }}>
-          <b>{fullName}</b> {comment}
+        <Typography >
+          <Link
+              href={`/${commentUserID}/profile`}
+              underline="none"
+              variant="body1"
+              color="black"
+              sx={{ fontSize: "15px", fontWeight: "600" }}
+            >
+              {fullName
+                ? String(fullName)
+                : "NO DATA!"}
+            </Link> {comment}
         </Typography>
       }
       subheader={

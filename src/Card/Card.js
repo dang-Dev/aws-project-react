@@ -80,7 +80,7 @@ export default function ViewCard(props) {
       const docRef = doc(db, "users", `${collections.userID}`);
       const data = await getDoc(docRef);
       setCardUser(data.data());
-    }; 
+    };
     getUser();
   }, [collections.userID]);
 
@@ -229,11 +229,9 @@ export default function ViewCard(props) {
         <CardHeader
           sx={{ textAlign: "left" }}
           avatar={
-            currentUser ? (
+            cardUser ? (
               <Avatar
-                {...stringAvatar(
-                  cardUser.firstName + " " + cardUser.lastName
-                )}
+                {...stringAvatar(cardUser.firstName + " " + cardUser.lastName)}
               />
             ) : (
               "No Avatar"
@@ -245,7 +243,15 @@ export default function ViewCard(props) {
             </IconButton>
           }
           title={
-            <Link href={`/${collections.userID}/profile`} underline="none" variant="body1" color="black" sx={{fontSize: "15px", fontWeight:"600"}}>{cardUser && cardUser.firstName + "" + cardUser.lastName}</Link>
+            <Link
+              href={`/${collections.userID}/profile`}
+              underline="none"
+              variant="body1"
+              color="black"
+              sx={{ fontSize: "15px", fontWeight: "600" }}
+            >
+              {cardUser ? String(cardUser.firstName + cardUser.lastName) : "NO DATA!"}
+            </Link>
           }
           subheader={newFormatDateTime.toLocaleString()}
         />
@@ -274,23 +280,33 @@ export default function ViewCard(props) {
         </CardActions>
         <CardContent sx={{ textAlign: "left", pt: 0 }}>
           <Typography sx={{ fontWeight: "600", fontSize: "14px" }}>
-            {userReaction.length !== 0 &&
-              (userReaction.length > 1
-                ? userReaction.length + " likes"
-                : userReaction.length + " like")}
+            {userReaction.length !== 0
+              ? userReaction.length > 1
+                ? String(userReaction.length) + " likes"
+                : String(userReaction.length) + " like"
+              : " "}
           </Typography>
           <Typography
             sx={{ fontSize: "14px", color: "#bdbdbd", cursor: "pointer" }}
             onClick={handleClickOpen}
           >
-            {comments && "View All " + comments.length + " comments"}
+            {comments.length !== 0 &&
+              comments &&
+              "View All " + comments.length + " comments"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <b>
-              {currentUser &&
-                currentUser.firstName + " " + currentUser.lastName}
+            <Link
+              href={`/${collections.userID}/profile`}
+              underline="none"
+              variant="body1"
+              color="black"
+              sx={{ fontSize: "15px", fontWeight: "600" }}
+            >
+              {cardUser ? String(cardUser.firstName + cardUser.lastName) : "NO DATA!"}
+            </Link>
             </b>{" "}
-            {collections.description}
+            {collections ? String(collections.description) : " "}
           </Typography>
         </CardContent>
         <Divider variant="fullWidth" />
@@ -342,7 +358,6 @@ export default function ViewCard(props) {
               <Item>
                 <Box sx={{ borderBottom: "1px solid #eceff1" }}>
                   <AvatarCard
-                    isNeckName={false}
                     firstName={currentUser ? currentUser.firstName : "No data!"}
                     lastName={currentUser ? currentUser.lastName : "No data!"}
                   />

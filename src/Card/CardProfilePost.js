@@ -58,7 +58,7 @@ export default function CardProfilePost(props) {
             alt={"img"}
             loading="lazy"
           />
-          <ImageListItemBar
+          <ImageListItemBar sx={{height: "45px", pl:0}}
             title={
               <>
                 <IconButton

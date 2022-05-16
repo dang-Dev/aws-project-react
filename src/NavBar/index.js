@@ -35,10 +35,12 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import { storage } from "../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import LinearProgress from "@mui/material/LinearProgress";
-import { addDoc, serverTimestamp, collection } from "firebase/firestore";
+import { addDoc, serverTimestamp, collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { useHistory } from "react-router-dom";
 import Container from "@mui/material/Container";
+import Autocomplete from "@mui/material/Autocomplete";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -125,6 +127,36 @@ export default function PrimarySearchAppBar() {
   const [progress, setProgress] = useState(0);
   const [description, setDescription] = useState();
   const history = useHistory();
+
+  const [openAPICall, setOpenAPICall] = useState(false);
+  const [options, setOptions] = useState([]);
+  const loading = openAPICall && options.length === 0;
+
+  useEffect(() => {
+    let active = true;
+
+    if (!loading) {
+      return undefined;
+    }
+
+    (async () => {
+      const data = await getDocs(collection(db, "users"));
+
+      if (active) {
+        setOptions(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      }
+    })();
+    
+    return () => {
+      active = false;
+    };
+  }, [loading]);
+  
+  useEffect(() => {
+    if (!openAPICall) {
+      setOptions([]);
+    }
+  }, [openAPICall]);
 
   // create a preview as a side effect, whenever selected file is changed
   useEffect(() => {
@@ -270,7 +302,11 @@ export default function PrimarySearchAppBar() {
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      <MenuItem onClick={()=>{history.push(`/${user.uid}/profile`)}}>
+      <MenuItem
+        onClick={() => {
+          history.push(`/${user.uid}/profile`);
+        }}
+      >
         <Avatar /> Profile
       </MenuItem>
       <Divider />
@@ -355,74 +391,108 @@ export default function PrimarySearchAppBar() {
             borderBottom: "1px solid #cfd8dc",
           }}
         >
-          <Container fixed sx={{width: "76%"}}>
-          <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              sx={{ mr: 0 }}
-            >
-              <LocalSeeIcon />
-            </IconButton>
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: "block", sm: "block" }, mr: 10 }}
-            >
-              PHOTOGRAPHY
-            </Typography>
-            <Search sx={{ display: { xs: "none", sm: "block" } }}>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
-            <Box sx={{ flexGrow: 1 }} />
-            <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <IconButton size="large" aria-label="home" color="inherit" onClick={()=>{history.push("/")}}>
-                <HomeIcon />
-              </IconButton>
+          <Container fixed sx={{ width: "76%" }}>
+            <Toolbar>
               <IconButton
                 size="large"
-                aria-label="add post"
+                edge="start"
                 color="inherit"
-                onClick={handleClickOpen}
+                aria-label="open drawer"
+                sx={{ mr: 0 }}
               >
-                {/* <Badge badgeContent={17} color="error"> */}
-                <AddBoxOutlinedIcon />
-                {/* </Badge> */}
+                <LocalSeeIcon />
               </IconButton>
-              <Tooltip title="Account settings">
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ display: { xs: "block", sm: "block" }, mr: 10 }}
+              >
+                PHOTOGRAPHY
+              </Typography>
+              <Search
+                sx={{ display: { xs: "none", sm: "block" }}}
+              >
+                {/* <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper> */}
+                <Autocomplete
+                  id="asynchronous-demo"
+                  sx={{ width: 280}}
+                  open={openAPICall}
+                  onOpen={() => {
+                    setOpenAPICall(true);
+                  }}
+                  onClose={() => {
+                    setOpenAPICall(false);
+                  }}
+                  isOptionEqualToValue={(option, value) =>
+                    option.firstName === value.firstName
+                  }
+                  getOptionLabel={(option) => option.firstName + " " + option.lastName}
+                  options={options}
+                  loading={loading}
+                  autoHighlight={true}
+                  onChange={(event, newValue)=>{ newValue && history.push(`/${newValue.id}/profile`)}}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size={"small"}
+                      placeholder={"Search..."}
+                      InputProps={{
+                        ...params.InputProps,
+                      }}
+                    />
+                  )}
+                />
+              </Search>
+              <Box sx={{ flexGrow: 1 }} />
+              <Box sx={{ display: { xs: "none", md: "flex" } }}>
                 <IconButton
-                  onClick={handleClick}
-                  size="small"
-                  aria-controls={open ? { menuId } : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={open ? "true" : undefined}
+                  size="large"
+                  aria-label="home"
+                  color="inherit"
+                  onClick={() => {
+                    history.push("/");
+                  }}
                 >
-                  <Avatar sx={{ width: 32, height: 32 }}>A</Avatar>
+                  <HomeIcon />
                 </IconButton>
-              </Tooltip>
-            </Box>
-            <Box sx={{ display: { xs: "flex", md: "none" } }}>
-              <IconButton
-                size="large"
-                aria-label="show more"
-                aria-controls={mobileMenuId}
-                aria-haspopup="true"
-                onClick={handleMobileMenuOpen}
-                color="inherit"
-              >
-                <MoreIcon />
-              </IconButton>
-            </Box>
-          </Toolbar>
+                <IconButton
+                  size="large"
+                  aria-label="add post"
+                  color="inherit"
+                  onClick={handleClickOpen}
+                >
+                  {/* <Badge badgeContent={17} color="error"> */}
+                  <AddBoxOutlinedIcon />
+                  {/* </Badge> */}
+                </IconButton>
+                <Tooltip title="Account settings">
+                  <IconButton
+                    onClick={handleClick}
+                    size="small"
+                    aria-controls={open ? { menuId } : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                  >
+                    <Avatar sx={{ width: 32, height: 32 }}>A</Avatar>
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Box sx={{ display: { xs: "flex", md: "none" } }}>
+                <IconButton
+                  size="large"
+                  aria-label="show more"
+                  aria-controls={mobileMenuId}
+                  aria-haspopup="true"
+                  onClick={handleMobileMenuOpen}
+                  color="inherit"
+                >
+                  <MoreIcon />
+                </IconButton>
+              </Box>
+            </Toolbar>
           </Container>
         </AppBar>
         {renderMobileMenu}
@@ -486,13 +556,13 @@ export default function PrimarySearchAppBar() {
                   aria-label="small button group"
                   fullWidth={true}
                 >
-                  <Button variant="contained" component="label" color="primary">
+                  <Button variant="outlined" component="label" >
                     {" "}
                     Change a file
                     <input type="file" hidden onChange={onSelectFile} />
                   </Button>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     component="label"
                     color="error"
                     onClick={() => {
