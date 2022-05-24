@@ -13,7 +13,6 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import Divider from "@mui/material/Divider";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CommentIcon from "@mui/icons-material/Comment";
 import {
   doc,
@@ -51,6 +50,7 @@ export default function ViewCard(props) {
   );
   const collection_id = collections.id;
   const userReaction = collections.reactions;
+
 
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -210,6 +210,8 @@ export default function ViewCard(props) {
     getAllComments();
   }, [collection_id]);
 
+  
+
   const handleClickOpen = () => {
     setUserComment("");
     commentInput.current.value = "";
@@ -237,11 +239,7 @@ export default function ViewCard(props) {
               "No Avatar"
             )
           }
-          action={
-            <IconButton aria-label="settings">
-              <MoreHorizIcon />
-            </IconButton>
-          }
+         
           title={
             <Link
               href={`/${collections.userID}/profile`}
@@ -250,10 +248,12 @@ export default function ViewCard(props) {
               color="black"
               sx={{ fontSize: "15px", fontWeight: "600" }}
             >
-              {cardUser ? String(cardUser.firstName + cardUser.lastName) : "NO DATA!"}
+              {cardUser
+                ? String(cardUser.firstName + cardUser.lastName)
+                : "NO DATA!"}
             </Link>
           }
-          subheader={newFormatDateTime.toLocaleString()}
+          subheader={newFormatDateTime.toDateString() + " " + newFormatDateTime.toLocaleTimeString()}
         />
         <CardMedia
           component="img"
@@ -296,15 +296,17 @@ export default function ViewCard(props) {
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <b>
-            <Link
-              href={`/${collections.userID}/profile`}
-              underline="none"
-              variant="body1"
-              color="black"
-              sx={{ fontSize: "15px", fontWeight: "600" }}
-            >
-              {cardUser ? String(cardUser.firstName + cardUser.lastName) : "NO DATA!"}
-            </Link>
+              <Link
+                href={`/${collections.userID}/profile`}
+                underline="none"
+                variant="body1"
+                color="black"
+                sx={{ fontSize: "15px", fontWeight: "600" }}
+              >
+                {cardUser
+                  ? String(cardUser.firstName + cardUser.lastName)
+                  : "NO DATA!"}
+              </Link>
             </b>{" "}
             {collections ? String(collections.description) : " "}
           </Typography>
@@ -360,6 +362,8 @@ export default function ViewCard(props) {
                   <AvatarCard
                     firstName={currentUser ? currentUser.firstName : "No data!"}
                     lastName={currentUser ? currentUser.lastName : "No data!"}
+                    handleClose={handleClose}
+                    isInCommentCard={true}
                   />
                 </Box>
                 <Box sx={{ width: "100%" }}>

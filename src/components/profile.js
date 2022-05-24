@@ -22,6 +22,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import CardProfilePost from "../Card/CardProfilePost";
@@ -57,6 +58,7 @@ function Copyright() {
 
 export default function Profile() {
   const [myPost, setMyPost] = useState({});
+  const [isDeleted, setIsDeleted] = useState(false);
   const { user } = useUserAuth();
   const [userDetails, setUserDetails] = useState();
   const [openDialog, setDialogOpen] = useState(false);
@@ -108,7 +110,8 @@ export default function Profile() {
       setMyPost(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     };
     userID && getUserPost();
-  }, [userID]);
+    console.log("effect")
+  }, [userID, isDeleted]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -118,6 +121,13 @@ export default function Profile() {
     };
     getUser();
   }, [userID]);
+
+  const deletePost = (id) => {
+    const postDoc = doc(db, "CollectionPost", id);
+    deleteDoc(postDoc);
+    setIsDeleted(!isDeleted)
+    console.log("deleted")
+  };
 
   return (
     <>
@@ -204,7 +214,7 @@ export default function Profile() {
               {myPost &&
                 (Object.keys(myPost).length > 0 ? (
                   myPost.map((post) => {
-                    return <CardProfilePost post={post} key={post.id} />;
+                    return <CardProfilePost post={post} key={post.id} handleDelete={deletePost} user={user} />;
                   })
                 ) : (
                   <Box sx={{ mt: 2, textAlign: "center" }}><Typography >"No Data Available!"</Typography></Box>

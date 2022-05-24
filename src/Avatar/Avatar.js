@@ -2,7 +2,7 @@ import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import CloseIcon from '@mui/icons-material/Close';
 import { Typography } from '@mui/material';
 
 function stringToColor(string) {
@@ -35,20 +35,32 @@ function stringAvatar(name) {
 }
 
 export default function  AvatarCard(props) {
-  const {firstName, lastName, neckName} = props
+  const {firstName, lastName, neckName, handleClose, isInCommentCard} = props
   const fullName = String(firstName) + " " + String(lastName);
   return (
-        <CardHeader sx={{ p:1.5, textAlign: "left", fontSize: "10px",  boxShadow: "none"}}
+        <>
+        {isInCommentCard ? (
+          <CardHeader sx={{ p:1.5, textAlign: "left", fontSize: "10px",  boxShadow: "none"}}
         avatar={
             <Avatar {...stringAvatar(firstName ? fullName : "No Data!")} />
         }
         action={
-          <IconButton aria-label="settings">
-            <MoreHorizIcon />
+          <IconButton aria-label="close" onClick={handleClose}>
+            <CloseIcon />
           </IconButton>
         }
         title = {<Typography sx={{fontWeight: "550", fontSize: "14px"}}>{fullName}</Typography>}
         subheader={neckName ? neckName: ""}
       />
+        ): (
+          <CardHeader sx={{ p:1.5, textAlign: "left", fontSize: "10px",  boxShadow: "none"}}
+        avatar={
+            <Avatar {...stringAvatar(firstName ? fullName : "No Data!")} />
+        }
+        title = {<Typography sx={{fontWeight: "550", fontSize: "14px"}}>{fullName}</Typography>}
+        subheader={neckName ? neckName: ""}
+      />
+        )}
+        </>
   );
 }
