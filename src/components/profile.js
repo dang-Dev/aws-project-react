@@ -22,9 +22,16 @@ import {
   doc,
   getDoc,
   updateDoc,
-   deleteDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { storage } from "../firebase";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+  deleteObject,
+} from "firebase/storage";
 import CardProfilePost from "../Card/CardProfilePost";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -33,6 +40,12 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useParams } from "react-router-dom";
 import { useUserAuth } from "../context/UserAuthContext";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "transparent",
@@ -65,7 +78,10 @@ export default function Profile() {
   const [firstNameRef, setFirstNameRef] = useState("");
   const [lastNameRef, setLastNameRef] = useState("");
   const [neckNameRef, setNeckNameRef] = useState("");
+  const [dialogProf, setDialogProf] = useState(false);
   const [tagLineRef, setTagLineRef] = useState("");
+  const [snackBarColor, setSnackBarColor] = useState("success")
+  const [snackBarText, setSnackBarText] = useState("")
   let { userID } = useParams();
 
   const handleDialogOpen = () => {
@@ -110,7 +126,7 @@ export default function Profile() {
       setMyPost(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     };
     userID && getUserPost();
-    console.log("effect")
+    console.log("effect");
   }, [userID, isDeleted]);
 
   useEffect(() => {
@@ -125,8 +141,94 @@ export default function Profile() {
   const deletePost = (id) => {
     const postDoc = doc(db, "CollectionPost", id);
     deleteDoc(postDoc);
-    setIsDeleted(!isDeleted)
-    console.log("deleted")
+    setIsDeleted(!isDeleted);
+    console.log("deleted");
+  };
+
+  const handleDialogProfOpen = () => {
+    setDialogProf(true);
+  };
+
+  const handleDialogProfClose = () => {
+    setDialogProf(false);
+  };
+
+  const onSelectFile = (e) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+    uploadFile(e.target.files[0]);
+  };
+
+  const uploadFile = (file) => {
+    if (!file) return;
+    const storageRef = ref(storage, `/Images/${user.uid}/profile/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_change",
+      (snapshot) => {
+        const prog = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        // setProgress(prog);
+        console.log(prog);
+      },
+      (err) => console.log("Error:", err),
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          const userRef = doc(db, "users", userID);
+          updateDoc(userRef, {
+            profileURL: url,
+            fileName: file.name,
+          });
+          console.log(url);
+          handleDialogProfClose();
+          setSnackBarColor("success");
+          setSnackBarText("Change profile photo success!");
+          handleAlertOpen();
+        });
+      }
+    );
+  };
+
+  const deleteProfileFile = () => {
+    // Create a reference to the file to delete
+    const desertRef = ref(storage, `/Images/${user.uid}/profile/${userDetails.fileName}`);
+    // Delete the file
+    deleteObject(desertRef)
+      .then(() => {
+        console.log("File deleted successfully");
+        const userRef = doc(db, "users", userID);
+          updateDoc(userRef, {
+            profileURL: "",
+            fileName: "",
+          });
+          handleDialogProfClose();
+          setSnackBarColor("success");
+          setSnackBarText("File deleted successfully!");
+          handleAlertOpen();
+      })
+      .catch((error) => {
+        handleDialogProfClose();
+        setSnackBarColor("error");
+        setSnackBarText("Uh-oh, an error occurred!");
+        handleAlertOpen();
+      });
+  };
+
+  const [openAlert, setOpenAlert] = useState(false);
+
+  const handleAlertOpen = () => {
+    setOpenAlert(true);
+  };
+
+  const handleAlertClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenAlert(false);
   };
 
   return (
@@ -135,8 +237,26 @@ export default function Profile() {
         <Box sx={{ flexGrow: 1, mt: 2 }}>
           <Grid container spacing={0} sx={{ mb: 2 }}>
             <Grid item xs={6} md={4}>
-              <Item sx={{ display: "flex", justifyContent: "center" }}>
-                <Avatar alt="P" src="" sx={{ width: 150, height: 150 }} />
+              <Item
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Item
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    borderRadius: "50%",
+                    border: "5px solid #f50057",
+                  }}
+                >
+                  <Avatar
+                    sx={{ width: 150, height: 150, cursor: "pointer" }}
+                    src={userDetails && userDetails.profileURL}
+                    onClick={handleDialogProfOpen}
+                  />
+                </Item>
               </Item>
             </Grid>
             <Grid item xs={6} md={8}>
@@ -152,9 +272,11 @@ export default function Profile() {
                           >
                             <Typography variant="h5" component="span">
                               {userDetails &&
-                                userDetails.firstName.charAt(0).toUpperCase() + userDetails.firstName.slice(1) +
+                                userDetails.firstName.charAt(0).toUpperCase() +
+                                  userDetails.firstName.slice(1) +
                                   " " +
-                                  userDetails.lastName.charAt(0).toUpperCase() + userDetails.lastName.slice(1)}
+                                  userDetails.lastName.charAt(0).toUpperCase() +
+                                  userDetails.lastName.slice(1)}
                             </Typography>
                           </TableCell>
                           <TableCell
@@ -214,10 +336,19 @@ export default function Profile() {
               {myPost &&
                 (Object.keys(myPost).length > 0 ? (
                   myPost.map((post) => {
-                    return <CardProfilePost post={post} key={post.id} handleDelete={deletePost} user={user} />;
+                    return (
+                      <CardProfilePost
+                        post={post}
+                        key={post.id}
+                        handleDelete={deletePost}
+                        user={user}
+                      />
+                    );
                   })
                 ) : (
-                  <Box sx={{ mt: 2, textAlign: "center" }}><Typography >"No Data Available!"</Typography></Box>
+                  <Box sx={{ mt: 2, textAlign: "center" }}>
+                    <Typography>"No Data Available!"</Typography>
+                  </Box>
                 ))}
             </Grid>
           </Box>
@@ -310,6 +441,49 @@ export default function Profile() {
           </Box>
         </DialogContent>
       </Dialog>
+      <Dialog
+        open={dialogProf}
+        onClose={handleDialogProfClose}
+        sx={{ textAlign: "center" }}
+      >
+        <DialogTitle>Change profile photo</DialogTitle>
+        <DialogContent dividers sx={{ p: 1.5 }}>
+          <DialogContentText sx={{ minWidth: 360, color: "blue" }}>
+            <Button variant="text" component="label" color="primary">
+              {" "}
+              Upload Photo
+              <input type="file" hidden onChange={onSelectFile} />
+            </Button>
+          </DialogContentText>
+        </DialogContent>
+        <DialogContent sx={{ p: 1.5 }}>
+          <DialogContentText sx={{ minWidth: 360, color: "red" }}>
+            <Button variant="text" color="error" onClick={deleteProfileFile}>
+              Remove current photo
+            </Button>
+          </DialogContentText>
+        </DialogContent>
+        <DialogContent dividers sx={{ p: 1.5 }}>
+          <DialogContentText sx={{ minWidth: 360 }}>
+            <Button onClick={handleDialogProfClose} sx={{ color: "black" }}>
+              Cancel
+            </Button>
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
+      <Snackbar
+        open={openAlert}
+        autoHideDuration={3000}
+        onClose={handleAlertClose}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={snackBarColor}
+          sx={{ width: "100%" }}
+        >
+          {snackBarText}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

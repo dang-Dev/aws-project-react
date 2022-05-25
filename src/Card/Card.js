@@ -103,35 +103,6 @@ export default function ViewCard(props) {
     }
   }, [userReaction, uid]);
 
-  function stringToColor(string) {
-    let hash = 0;
-    let i;
-
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let color = "#";
-
-    for (i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.slice(-2);
-    }
-    /* eslint-enable no-bitwise */
-
-    return color;
-  }
-
-  function stringAvatar(name) {
-    return {
-      sx: {
-        bgcolor: stringToColor(name),
-      },
-      children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
-    };
-  }
-
   const handleComments = (e) => {
     setUserComment(e.target.value);
   };
@@ -232,9 +203,7 @@ export default function ViewCard(props) {
           sx={{ textAlign: "left" }}
           avatar={
             cardUser ? (
-              <Avatar
-                {...stringAvatar(cardUser.firstName + " " + cardUser.lastName)}
-              />
+              <Avatar sx={{ width: 32, height: 32, border: "1px solid #f50057" }} src={cardUser && cardUser.profileURL} /> 
             ) : (
               "No Avatar"
             )
@@ -360,6 +329,7 @@ export default function ViewCard(props) {
               <Item>
                 <Box sx={{ borderBottom: "1px solid #eceff1" }}>
                   <AvatarCard
+                    profileURL = {currentUser && currentUser.profileURL}
                     firstName={currentUser ? currentUser.firstName : "No data!"}
                     lastName={currentUser ? currentUser.lastName : "No data!"}
                     handleClose={handleClose}

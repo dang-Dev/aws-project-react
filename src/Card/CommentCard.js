@@ -9,36 +9,6 @@ import { db } from "../firebase";
 import { Link } from "@mui/material";
 
 
-function stringToColor(string) {
-  let hash = 0;
-  let i;
-
-  /* eslint-disable no-bitwise */
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  let color = "#";
-
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  /* eslint-enable no-bitwise */
-
-  return color;
-}
-
-function stringAvatar(name) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-      marginTop: "-20px",
-    },
-    children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
-  };
-}
-
 export default function AvatarCard(props) {
   const { commentUserID, comment, createdAt } = props;
   const [currentUserData, setCurrentUserData] = useState({});
@@ -81,7 +51,7 @@ export default function AvatarCard(props) {
   return (
     <CardHeader
       sx={{ p: 1.5, textAlign: "left", fontSize: "10px", boxShadow: "none" }}
-      avatar={<Avatar {...stringAvatar((fullName ? fullName : "No Data"))} />}
+      avatar={<Avatar sx={{ width: 32, height: 32, border: "1px solid #f50057" }} src={currentUserData && currentUserData.profileURL} />}
       action={
         <IconButton aria-label="heart">
           <FavoriteBorderIcon sx={{ width: "16px", height: "16px" }} />

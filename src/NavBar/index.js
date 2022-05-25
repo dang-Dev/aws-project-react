@@ -9,7 +9,6 @@ import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import LocalSeeIcon from "@mui/icons-material/LocalSee";
@@ -33,7 +32,7 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import { storage } from "../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import LinearProgress from "@mui/material/LinearProgress";
-import { addDoc, serverTimestamp, collection, getDocs } from "firebase/firestore";
+import { addDoc, serverTimestamp, collection, getDocs, getDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useHistory } from "react-router-dom";
 import Container from "@mui/material/Container";
@@ -119,6 +118,7 @@ const Search = styled("div")(({ theme }) => ({
 // }));
 
 export default function PrimarySearchAppBar() {
+
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
   const [progress, setProgress] = useState(0);
@@ -128,6 +128,8 @@ export default function PrimarySearchAppBar() {
   const [openAPICall, setOpenAPICall] = useState(false);
   const [options, setOptions] = useState([]);
   const loading = openAPICall && options.length === 0;
+  const [userDetails, setUserDetails] = useState();
+
 
   useEffect(() => {
     let active = true;
@@ -174,8 +176,9 @@ export default function PrimarySearchAppBar() {
       return;
     }
     setSelectedFile(e.target.files[0]);
+    
   };
-
+  
   const { user, logOut } = useUserAuth();
 
   const [open, setOpen] = useState(false);
@@ -304,7 +307,7 @@ export default function PrimarySearchAppBar() {
           history.push(`/${user.uid}/profile`);
         }}
       >
-        <Avatar /> Profile
+        <Avatar sx={{ width: 25, height: 25, border: "1px solid #f50057" }} src={userDetails && userDetails.profileURL} />  Profile
       </MenuItem>
       <Divider />
       <MenuItem onClick={handleLogOut}>
@@ -369,13 +372,22 @@ export default function PrimarySearchAppBar() {
           aria-haspopup="true"
           color="inherit"
         >
-          <AccountCircle />
+          <Avatar sx={{ width: 32, height: 32, border: "1px solid #f50057" }} src={userDetails && userDetails.profileURL} />
         </IconButton>
         <p>Profile</p>
       </MenuItem>
     </Menu>
   );
 
+  useEffect(() => {
+    const getUser = async () => {
+      const docRef = doc(db, "users", `${user.uid}`);
+      const data = await getDoc(docRef);
+      setUserDetails(data.data());
+    };
+    getUser();
+  }, [user])
+  
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -395,7 +407,7 @@ export default function PrimarySearchAppBar() {
                 edge="start"
                 color="inherit"
                 aria-label="open drawer"
-                sx={{ mr: 0 }}
+                sx={{ mr: 0 , color: "#f50057"}}
               >
                 <LocalSeeIcon />
               </IconButton>
@@ -403,7 +415,7 @@ export default function PrimarySearchAppBar() {
                 variant="h6"
                 noWrap
                 component="div"
-                sx={{ display: { xs: "block", sm: "block" }, mr: 10 }}
+                sx={{ display: { xs: "block", sm: "block" }, color: "#f50057", mr: 10 }}
               >
                 PHOTOGRAPHY
               </Typography>
@@ -453,7 +465,7 @@ export default function PrimarySearchAppBar() {
                     history.push("/");
                   }}
                 >
-                  <HomeIcon />
+                  <HomeIcon sx={{color: "#f50057"}} />
                 </IconButton>
                 <IconButton
                   size="large"
@@ -462,7 +474,7 @@ export default function PrimarySearchAppBar() {
                   onClick={handleClickOpen}
                 >
                   {/* <Badge badgeContent={17} color="error"> */}
-                  <AddBoxOutlinedIcon />
+                  <AddBoxOutlinedIcon sx={{color: "#f50057"}}  />
                   {/* </Badge> */}
                 </IconButton>
                 <Tooltip title="Account settings">
@@ -473,7 +485,7 @@ export default function PrimarySearchAppBar() {
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
                   >
-                    <Avatar sx={{ width: 32, height: 32 }}>A</Avatar>
+                    <Avatar sx={{ width: 32, height: 32, border: "1px solid #f50057" }} src={userDetails && userDetails.profileURL} />
                   </IconButton>
                 </Tooltip>
               </Box>

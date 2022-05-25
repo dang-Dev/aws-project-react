@@ -97,8 +97,6 @@ const Home = () => {
    
   }, [collectionPost]);
 
-  console.log(reactions);
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
@@ -128,6 +126,7 @@ const Home = () => {
                 <ColItem>
                   <AvatarCard
                     isInCommentCard={false}
+                    profileURL = {currentUserData && currentUserData.profileURL}
                     neckName={
                       currentUserData ? currentUserData.neckName : "No Data!"
                     }
